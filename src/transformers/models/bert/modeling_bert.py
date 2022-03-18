@@ -1509,9 +1509,14 @@ class BertForSequenceClassification(BertPreTrainedModel):
             config.classifier_dropout if config.classifier_dropout is not None else config.hidden_dropout_prob
         )
         self.dropout = nn.Dropout(classifier_dropout)
-        self.classifier = nn.Linear(config.hidden_size, config.num_labels)
 
-        # Initialize weights and apply final processing
+        if config.num_labels > 1:
+            self.classifier = nn.Linear(config.hidden_size, config.num_labels)
+        else:
+            self.classifier = nn.Sequential(
+                nn.Linear(config.hidden_size, config.num_labels),
+                nn.Sigmoid()
+            )
         self.post_init()
 
     @add_start_docstrings_to_model_forward(BERT_INPUTS_DOCSTRING.format("batch_size, sequence_length"))
