@@ -1504,7 +1504,7 @@ class BertForSequenceClassification(BertPreTrainedModel):
         super().__init__(config)
         self.num_labels = config.num_labels
         self.config = config
-        self.softmax = nn.Softmax(dim=0)
+        self.softmax = nn.Softmax(dim=1)
 
         self.bert = BertModel(config)
         classifier_dropout = (
@@ -1575,8 +1575,6 @@ class BertForSequenceClassification(BertPreTrainedModel):
             loss = loss_fct(logits.squeeze(), labels.squeeze())
         else:
             logits = self.softmax(logits)
-            print("logits: ", logits)
-            print("labels: ", labels)
             loss = loss_fct(logits, labels)
         if not return_dict:
             output = (logits,) + outputs[2:]
