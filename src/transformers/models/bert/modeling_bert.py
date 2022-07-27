@@ -1576,6 +1576,8 @@ class BertForSequenceClassification(BertPreTrainedModel):
             loss = loss_fct(logits.squeeze(), labels.squeeze())
         else:
             logits = self.softmax(logits)
+            print("logits: ", logits)
+            print("labels: ", labels)
             loss = loss_fct(logits, labels)
         if not return_dict:
             output = (logits,) + outputs[2:]
