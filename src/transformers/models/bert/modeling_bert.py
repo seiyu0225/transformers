@@ -1515,7 +1515,6 @@ class BertForSequenceClassification(BertPreTrainedModel):
         if config.num_labels > 1:
             self.classifier = nn.Sequential(
                 nn.Linear(config.hidden_size, config.num_labels),
-                nn.Softmax()
             )
         else:
             self.classifier = nn.Sequential(
