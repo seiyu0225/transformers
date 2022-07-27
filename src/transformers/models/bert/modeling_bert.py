@@ -1498,7 +1498,7 @@ class BertForNextSentencePrediction(BertPreTrainedModel):
     """,
     BERT_START_DOCSTRING,
 )
-class BertForSequenceClassification(BertPreTrainedModel):
+class BertForRegression(BertPreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
         self.num_labels = config.num_labels
@@ -1511,7 +1511,10 @@ class BertForSequenceClassification(BertPreTrainedModel):
         self.dropout = nn.Dropout(classifier_dropout)
 
         if config.num_labels > 1:
-            self.classifier = nn.Linear(config.hidden_size, config.num_labels)
+            self.classifier = nn.Sequential(
+                nn.Linear(config.hidden_size, config.num_labels),
+                nn.Softmax()
+            )
         else:
             self.classifier = nn.Sequential(
                 nn.Linear(config.hidden_size, config.num_labels),
@@ -1565,27 +1568,12 @@ class BertForSequenceClassification(BertPreTrainedModel):
         logits = self.classifier(pooled_output)
 
         loss = None
-        if labels is not None:
-            if self.config.problem_type is None:
-                if self.num_labels == 1:
-                    self.config.problem_type = "regression"
-                elif self.num_labels > 1:
-                    self.config.problem_type = "single_label_classification"
-                else:
-                    self.config.problem_type = "multi_label_classification"
-
-            if self.config.problem_type == "regression":
-                loss_fct = MSELoss()
-                if self.num_labels == 1:
-                    loss = loss_fct(logits.squeeze(), labels.squeeze())
-                else:
-                    loss = loss_fct(logits, labels)
-            elif self.config.problem_type == "single_label_classification":
-                loss_fct = CrossEntropyLoss()
-                loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1, self.num_labels))
-            elif self.config.problem_type == "multi_label_classification":
-                loss_fct = BCEWithLogitsLoss()
-                loss = loss_fct(logits, labels)
+        self.config.problem_type = "regression"
+        loss_fct = MSELoss()
+        if self.num_labels == 1:
+            loss = loss_fct(logits.squeeze(), labels.squeeze())
+        else:
+            loss = loss_fct(logits, labels)
         if not return_dict:
             output = (logits,) + outputs[2:]
             return ((loss,) + output) if loss is not None else output
