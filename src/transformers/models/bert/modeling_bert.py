@@ -1498,7 +1498,7 @@ class BertForNextSentencePrediction(BertPreTrainedModel):
     """,
     BERT_START_DOCSTRING,
 )
-class BertForRegression(BertPreTrainedModel):
+class BertForSequenceClassification(BertPreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
         self.num_labels = config.num_labels
