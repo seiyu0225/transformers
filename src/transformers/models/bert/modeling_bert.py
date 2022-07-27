@@ -16,6 +16,7 @@
 """PyTorch BERT model."""
 
 
+from cProfile import label
 import math
 import os
 import warnings
@@ -1503,6 +1504,7 @@ class BertForSequenceClassification(BertPreTrainedModel):
         super().__init__(config)
         self.num_labels = config.num_labels
         self.config = config
+        self.softmax = nn.Softmax(dim=0)
 
         self.bert = BertModel(config)
         classifier_dropout = (
@@ -1573,8 +1575,7 @@ class BertForSequenceClassification(BertPreTrainedModel):
         if self.num_labels == 1:
             loss = loss_fct(logits.squeeze(), labels.squeeze())
         else:
-            print("logits: ", logits)
-            print("labels: ", labels)
+            logits = self.softmax(logits)
             loss = loss_fct(logits, labels)
         if not return_dict:
             output = (logits,) + outputs[2:]
