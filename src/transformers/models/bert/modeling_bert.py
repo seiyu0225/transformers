@@ -1568,10 +1568,12 @@ class BertForSequenceClassification(BertPreTrainedModel):
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)
 
+
         loss = None
         self.config.problem_type = "regression"
         loss_fct = MSELoss()
         if self.num_labels == 1:
+            print
             loss = loss_fct(logits.squeeze(), labels.squeeze())
         else:
             logits = self.softmax(logits)
