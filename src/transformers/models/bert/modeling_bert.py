@@ -1573,7 +1573,9 @@ class BertForSequenceClassification(BertPreTrainedModel):
         self.config.problem_type = "regression"
         loss_fct = MSELoss()
         if self.num_labels == 1:
-            print
+            print("logits:", logits)
+            print("labels:", labels)
+
             loss = loss_fct(logits.squeeze(), labels.squeeze())
         else:
             logits = self.softmax(logits)
